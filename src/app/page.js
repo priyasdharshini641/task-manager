@@ -12,53 +12,87 @@ export default function Home() {
   const [editingId, setEditingId] = useState(null);
   const [editTitle, setEditTitle] = useState('');
   const [showForm, setShowForm] = useState(false);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState('');
 
   useEffect(() => { loadTasks(); }, []);
 
   async function loadTasks() {
-    const res = await fetch('/api/tasks');
-    const data = await res.json();
-    setTasks(data);
+    try {
+      setError('');
+      const res = await fetch('/api/tasks');
+      if (!res.ok) throw new Error('Failed to load tasks');
+      const data = await res.json();
+      setTasks(data);
+    } catch (err) {
+      setError('Could not load tasks. Please refresh the page.');
+    } finally {
+      setLoading(false);
+    }
   }
 
   async function addTask(e) {
     e.preventDefault();
     if (!title.trim()) return;
-    await fetch('/api/tasks', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ title, description, priority, dueDate: dueDate || null }),
-    });
-    setTitle('');
-    setDescription('');
-    setPriority('medium');
-    setDueDate('');
-    setShowForm(false);
-    loadTasks();
+    try {
+      setError('');
+      const res = await fetch('/api/tasks', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ title, description, priority, dueDate: dueDate || null }),
+      });
+      if (!res.ok) throw new Error('Failed to add task');
+      setTitle('');
+      setDescription('');
+      setPriority('medium');
+      setDueDate('');
+      setShowForm(false);
+      loadTasks();
+    } catch (err) {
+      setError('Could not add task. Please try again.');
+    }
   }
 
   async function toggleComplete(task) {
-    await fetch(`/api/tasks/${task.id}`, {
-      method: 'PUT',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ completed: !task.completed }),
-    });
-    loadTasks();
+    try {
+      setError('');
+      const res = await fetch(`/api/tasks/${task.id}`, {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ completed: !task.completed }),
+      });
+      if (!res.ok) throw new Error('Failed to update task');
+      loadTasks();
+    } catch (err) {
+      setError('Could not update task. Please try again.');
+    }
   }
 
   async function deleteTask(id) {
-    await fetch(`/api/tasks/${id}`, { method: 'DELETE' });
-    loadTasks();
+    try {
+      setError('');
+      const res = await fetch(`/api/tasks/${id}`, { method: 'DELETE' });
+      if (!res.ok) throw new Error('Failed to delete task');
+      loadTasks();
+    } catch (err) {
+      setError('Could not delete task. Please try again.');
+    }
   }
 
   async function saveEdit(id) {
-    await fetch(`/api/tasks/${id}`, {
-      method: 'PUT',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ title: editTitle }),
-    });
-    setEditingId(null);
-    loadTasks();
+    try {
+      setError('');
+      const res = await fetch(`/api/tasks/${id}`, {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ title: editTitle }),
+      });
+      if (!res.ok) throw new Error('Failed to save task');
+      setEditingId(null);
+      loadTasks();
+    } catch (err) {
+      setError('Could not save changes. Please try again.');
+    }
   }
 
   const filteredTasks = tasks.filter((t) => {
@@ -96,6 +130,13 @@ export default function Home() {
             + New Task
           </button>
         </div>
+
+        {/* Error banner */}
+        {error && (
+          <div className="bg-red-500/10 border border-red-500/30 text-red-300 rounded-xl p-3 mb-4 text-sm">
+            {error}
+          </div>
+        )}
 
         {/* Stat cards */}
         <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 mb-4">
@@ -200,7 +241,12 @@ export default function Home() {
 
         {/* Task list */}
         <div className="space-y-3">
-          {filteredTasks.length === 0 && (
+          {loading && (
+            <div className="flex justify-center py-10">
+              <div className="w-8 h-8 border-2 border-purple-400/30 border-t-purple-400 rounded-full animate-spin" />
+            </div>
+          )}
+          {!loading && filteredTasks.length === 0 && (
             <p className="text-gray-500 text-center py-10">No tasks here yet.</p>
           )}
           {filteredTasks.map((task) => (
