@@ -148,7 +148,7 @@ Open [http://localhost:3000](http://localhost:3000) in your browser.
 As required by the assignment brief, I am transparently disclosing AI tool usage:
 
 - **Google Antigravity (Gemini)** — used for debugging, code review and identifying deployment issues. All code was reviewed and understood before use.
-- **Claude** — used to code generation and running trials.
+- **Claude** — used for code generation and running trials.
 ---
 
 ## Submission
