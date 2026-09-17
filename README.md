@@ -147,10 +147,8 @@ Open [http://localhost:3000](http://localhost:3000) in your browser.
 
 As required by the assignment brief, I am transparently disclosing AI tool usage:
 
-- **Google Antigravity (Gemini)** — used for debugging, code review, identifying deployment issues, and generating this README. All code was reviewed and understood before use.
-
-I am able to explain every part of the implementation — the architecture, API design, auth flow, and database schema — as required for Round 2.
-
+- **Google Antigravity (Gemini)** — used for debugging, code review and identifying deployment issues. All code was reviewed and understood before use.
+- **Claude** — used to code generation and running trials.
 ---
 
 ## Submission
