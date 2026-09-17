@@ -1,16 +1,14 @@
 # Task Manager
 
-**Lunorsoft Technologies — Full Stack Developer Internship · Round 1 Submission**
-
 A full-stack student task management application built with Next.js, PostgreSQL, and Prisma. Students can sign up, log in, and manage their personal tasks with priorities, due dates, search, and progress tracking.
 
-## 🔗 Live Demo
+## Live Demo
 
 **[http://task-manager-orcin-omega-30.vercel.app/](http://task-manager-orcin-omega-30.vercel.app/)**
 
 ---
 
-## ✅ Features
+## Features
 
 ### Core Requirements
 - **Create** tasks with a title, description, priority, and due date
@@ -22,18 +20,18 @@ A full-stack student task management application built with Next.js, PostgreSQL,
 - **PostgreSQL database** via Prisma ORM — all data is persisted
 
 ### Bonus Features Implemented
-- 🔐 **Authentication** — JWT-based signup, login, and logout with `httpOnly` cookies
-- 🔍 **Search** — real-time search across task titles
-- 🏷️ **Task Priority** — Low / Medium / High with colour-coded badges
-- 📅 **Due Dates** — optional due date picker per task
-- 📊 **Dashboard / Statistics** — total, pending, and completed task counts with a live progress bar
-- 🚀 **Deployment** — live on Vercel
-- ✔️ **Form Validation** — email format, minimum password length (6 chars), required title
-- ⚠️ **Error Handling** — user-friendly error banners for all API failures
+- **Authentication** — JWT-based signup, login, and logout with `httpOnly` cookies
+- **Search** — real-time search across task titles
+- **Task Priority** — Low / Medium / High with colour-coded badges
+- **Due Dates** — optional due date picker per task
+- **Dashboard / Statistics** — total, pending, and completed task counts with a live progress bar
+- **Deployment** — live on Vercel
+- **Form Validation** — email format, minimum password length (6 chars), required title
+- **Error Handling** — user-friendly error banners for all API failures
 
 ---
 
-## 🏗️ Architecture & Approach
+## Architecture & Approach
 
 ### Frontend
 - **Next.js 16 (App Router)** — single-page client component (`page.js`) managing all UI state with React hooks
@@ -63,7 +61,7 @@ A full-stack student task management application built with Next.js, PostgreSQL,
 
 ---
 
-## 🗂️ Project Structure
+## Project Structure
 
 ```
 src/
@@ -90,7 +88,7 @@ prisma/
 
 ---
 
-## ⚙️ Local Setup
+## Local Setup
 
 ### Prerequisites
 - Node.js 18+
@@ -132,7 +130,7 @@ Open [http://localhost:3000](http://localhost:3000) in your browser.
 
 ---
 
-## 🛠️ Tech Stack
+## Tech Stack
 
 | Layer | Technology |
 |---|---|
@@ -145,7 +143,7 @@ Open [http://localhost:3000](http://localhost:3000) in your browser.
 
 ---
 
-## 🤖 AI Tools Used
+## AI Tools Used
 
 As required by the assignment brief, I am transparently disclosing AI tool usage:
 
@@ -155,9 +153,7 @@ I am able to explain every part of the implementation — the architecture, API 
 
 ---
 
-## 📬 Submission
-
-**Candidate role:** Full Stack Developer
+## Submission
 **Live URL:** [http://task-manager-orcin-omega-30.vercel.app/](http://task-manager-orcin-omega-30.vercel.app/)
 **GitHub:** [github.com/priyasdharshini641/task-manager](https://github.com/priyasdharshini641/task-manager)
 
