@@ -7,6 +7,7 @@ export default function Home() {
   const [description, setDescription] = useState('');
   const [priority, setPriority] = useState('medium');
   const [dueDate, setDueDate] = useState('');
+  const [search, setSearch] = useState('');
   const [filter, setFilter] = useState('all');
   const [editingId, setEditingId] = useState(null);
   const [editTitle, setEditTitle] = useState('');
@@ -61,13 +62,15 @@ export default function Home() {
   }
 
   const filteredTasks = tasks.filter((t) => {
-    if (filter === 'pending') return !t.completed;
-    if (filter === 'completed') return t.completed;
+    if (filter === 'pending' && t.completed) return false;
+    if (filter === 'completed' && !t.completed) return false;
+    if (search.trim() && !t.title.toLowerCase().includes(search.toLowerCase())) return false;
     return true;
   });
 
   const pendingCount = tasks.filter((t) => !t.completed).length;
   const completedCount = tasks.filter((t) => t.completed).length;
+  const progressPercent = tasks.length === 0 ? 0 : Math.round((completedCount / tasks.length) * 100);
 
   const priorityStyles = {
     high: 'bg-pink-500/20 text-pink-300 border-pink-500/30',
@@ -95,7 +98,7 @@ export default function Home() {
         </div>
 
         {/* Stat cards */}
-        <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 mb-6">
+        <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 mb-4">
           <div className="bg-white/5 backdrop-blur border border-white/10 rounded-2xl p-5">
             <p className="text-gray-400 text-sm mb-1">Total Tasks</p>
             <p className="text-3xl font-bold">{tasks.length}</p>
@@ -107,6 +110,20 @@ export default function Home() {
           <div className="bg-white/5 backdrop-blur border border-white/10 rounded-2xl p-5">
             <p className="text-gray-400 text-sm mb-1">Completed</p>
             <p className="text-3xl font-bold text-pink-300">{completedCount}</p>
+          </div>
+        </div>
+
+        {/* Progress bar */}
+        <div className="bg-white/5 backdrop-blur border border-white/10 rounded-2xl p-5 mb-6">
+          <div className="flex justify-between items-center mb-2">
+            <p className="text-gray-400 text-sm">Overall progress</p>
+            <p className="text-sm font-medium text-purple-300">{progressPercent}%</p>
+          </div>
+          <div className="w-full bg-black/30 rounded-full h-2.5 overflow-hidden">
+            <div
+              className="bg-gradient-to-r from-purple-500 to-pink-500 h-2.5 rounded-full transition-all duration-500"
+              style={{ width: `${progressPercent}%` }}
+            />
           </div>
         </div>
 
@@ -154,6 +171,15 @@ export default function Home() {
             </button>
           </form>
         )}
+
+        {/* Search */}
+        <input
+          type="text"
+          placeholder="Search tasks..."
+          value={search}
+          onChange={(e) => setSearch(e.target.value)}
+          className="w-full bg-white/5 border border-white/10 rounded-xl p-3 mb-4 outline-none focus:border-purple-400/50 placeholder-gray-500"
+        />
 
         {/* Filter pills */}
         <div className="flex gap-2 mb-5">
