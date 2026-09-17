@@ -2,6 +2,15 @@
 import { useState, useEffect } from 'react';
 
 export default function Home() {
+  // Auth state
+  const [user, setUser] = useState(null);
+  const [authLoading, setAuthLoading] = useState(true);
+  const [authMode, setAuthMode] = useState('login'); // 'login' or 'signup'
+  const [email, setEmail] = useState('');
+  const [password, setPassword] = useState('');
+  const [authError, setAuthError] = useState('');
+
+  // Task state
   const [tasks, setTasks] = useState([]);
   const [title, setTitle] = useState('');
   const [description, setDescription] = useState('');
@@ -15,7 +24,46 @@ export default function Home() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
 
-  useEffect(() => { loadTasks(); }, []);
+  useEffect(() => { checkAuth(); }, []);
+
+  async function checkAuth() {
+    try {
+      const res = await fetch('/api/auth/me');
+      const data = await res.json();
+      setUser(data.user);
+      if (data.user) loadTasks();
+    } catch (err) {
+      setUser(null);
+    } finally {
+      setAuthLoading(false);
+    }
+  }
+
+  async function handleAuth(e) {
+    e.preventDefault();
+    setAuthError('');
+    try {
+      const res = await fetch(`/api/auth/${authMode}`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ email, password }),
+      });
+      const data = await res.json();
+      if (!res.ok) throw new Error(data.error || 'Something went wrong');
+      setUser(data);
+      setEmail('');
+      setPassword('');
+      loadTasks();
+    } catch (err) {
+      setAuthError(err.message);
+    }
+  }
+
+  async function handleLogout() {
+    await fetch('/api/auth/logout', { method: 'POST' });
+    setUser(null);
+    setTasks([]);
+  }
 
   async function loadTasks() {
     try {
@@ -112,6 +160,71 @@ export default function Home() {
     low: 'bg-gray-500/20 text-gray-300 border-gray-500/30',
   };
 
+  // ---- Loading auth state ----
+  if (authLoading) {
+    return (
+      <main className="min-h-screen bg-[#0a0a0f] flex items-center justify-center">
+        <div className="w-8 h-8 border-2 border-purple-400/30 border-t-purple-400 rounded-full animate-spin" />
+      </main>
+    );
+  }
+
+  // ---- Not logged in: show login/signup screen ----
+  if (!user) {
+    return (
+      <main className="min-h-screen bg-[#0a0a0f] text-white flex items-center justify-center p-4">
+        <div className="w-full max-w-sm bg-white/5 backdrop-blur border border-white/10 rounded-2xl p-6">
+          <h1 className="text-2xl font-bold mb-1">
+            {authMode === 'login' ? 'Welcome back' : 'Create an account'}
+          </h1>
+          <p className="text-gray-400 text-sm mb-6">Student Task Manager</p>
+
+          {authError && (
+            <div className="bg-red-500/10 border border-red-500/30 text-red-300 rounded-xl p-3 mb-4 text-sm">
+              {authError}
+            </div>
+          )}
+
+          <form onSubmit={handleAuth} className="space-y-3">
+            <input
+              type="email"
+              required
+              placeholder="Email"
+              value={email}
+              onChange={(e) => setEmail(e.target.value)}
+              className="w-full bg-black/30 border border-white/10 rounded-xl p-3 outline-none focus:border-purple-400/50 placeholder-gray-500"
+            />
+            <input
+              type="password"
+              required
+              placeholder="Password (min 6 characters)"
+              value={password}
+              onChange={(e) => setPassword(e.target.value)}
+              className="w-full bg-black/30 border border-white/10 rounded-xl p-3 outline-none focus:border-purple-400/50 placeholder-gray-500"
+            />
+            <button
+              type="submit"
+              className="w-full bg-gradient-to-r from-purple-500 to-pink-500 hover:opacity-90 transition text-white px-5 py-2.5 rounded-xl font-medium"
+            >
+              {authMode === 'login' ? 'Log In' : 'Sign Up'}
+            </button>
+          </form>
+
+          <p className="text-sm text-gray-400 mt-4 text-center">
+            {authMode === 'login' ? "Don't have an account? " : 'Already have an account? '}
+            <button
+              onClick={() => { setAuthMode(authMode === 'login' ? 'signup' : 'login'); setAuthError(''); }}
+              className="text-purple-300 hover:text-purple-200 font-medium"
+            >
+              {authMode === 'login' ? 'Sign up' : 'Log in'}
+            </button>
+          </p>
+        </div>
+      </main>
+    );
+  }
+
+  // ---- Logged in: show the task manager ----
   return (
     <main className="min-h-screen bg-[#0a0a0f] text-white p-4 md:p-8">
       <div className="max-w-5xl mx-auto">
@@ -119,16 +232,24 @@ export default function Home() {
         <div className="flex items-center justify-between mb-8">
           <div>
             <h1 className="text-3xl font-bold">
-              Welcome, <span className="bg-gradient-to-r from-purple-400 to-pink-400 bg-clip-text text-transparent">Student</span>
+              Welcome, <span className="bg-gradient-to-r from-purple-400 to-pink-400 bg-clip-text text-transparent">{user.email.split('@')[0]}</span>
             </h1>
             <p className="text-gray-400 text-sm mt-1">Here's your task overview</p>
           </div>
-          <button
-            onClick={() => setShowForm(!showForm)}
-            className="bg-gradient-to-r from-purple-500 to-pink-500 hover:opacity-90 transition text-white px-5 py-2.5 rounded-xl font-medium shadow-lg shadow-purple-500/20"
-          >
-            + New Task
-          </button>
+          <div className="flex gap-2">
+            <button
+              onClick={() => setShowForm(!showForm)}
+              className="bg-gradient-to-r from-purple-500 to-pink-500 hover:opacity-90 transition text-white px-5 py-2.5 rounded-xl font-medium shadow-lg shadow-purple-500/20"
+            >
+              + New Task
+            </button>
+            <button
+              onClick={handleLogout}
+              className="bg-white/5 border border-white/10 hover:bg-white/10 transition text-gray-300 px-4 py-2.5 rounded-xl font-medium"
+            >
+              Log Out
+            </button>
+          </div>
         </div>
 
         {/* Error banner */}
